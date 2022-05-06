@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link rel="icon" href="/images/Logotipo_png.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/javascripts/html5-qrcode.min.js"></script>
+  </head>
+  <body>
+    {{> header}}
+    {{{body}}}
+    {{> footer}}
+    <script type="text/javascript">
+        function showData(){ 
+            document.getElementById('result').innerHTML = '<span class="result">'+qrCodeMessage+'</span>';
+            fetch('http://localhost:3000/code', {
+              headers: {
+                'Content-type': 'application/json'
+              },
+              method: 'POST',
+              body: JSON.stringify({ code: qrCodeMessage})
+              })
+              .then(function(response) {
+
+                // Transforma la respuesta. En este caso lo convierte a JSON
+                return response.json();
+                
+              })
+              .then(function(json) {
+                  Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: json.vacunado,
+                    showConfirmButton: false,
+                    timer: 1000
+                  });
+                console.log(json)
+              });
+        }
+         function onScanSuccess(qrCodeMessage) {
+          console.log("Entrando");
+          //********************************************************
+          const str = `${qrCodeMessage}`;
+
+          const primerdospuntos = str.indexOf(':');
+
+          const coma = str.indexOf(',');
+              const segundodospuntos = str.indexOf(':', (primerdospuntos + 1))
+              const cierre = str.indexOf('}');
+
+          const Producto = str.substr(primerdospuntos+1,coma-primerdospuntos-1);
+          const precio = parseInt(str.substr(segundodospuntos+1,cierre-segundodospuntos-1));
+
+          const input = document.createElement("input");
+          input.type = "text";
+          input.value = precio;
+          let p = document.createElement("p");
+          let pTexto = document.createTextNode(Producto);
+          p.appendChild(pTexto);
+
+          //input.disabled = true;
+
+
+
+            //innerHTML = '<span class="result">'+qrCodeMessage+"Hola"+'</span>';
+            fetch('http://localhost:3000/code', {
+              headers: {
+                'Content-type': 'application/json'
+              },
+              method: 'POST',
+              body: JSON.stringify({ code: qrCodeMessage})
+              })
+              .then(function(response) {
+                // Transforma la respuesta. En este caso lo convierte a JSON
+                return response.json();
+              })
+              .then(function(json) {
+              if(precio != 0 ){
+                    let timerInterval
+                    Swal.fire({
+                      title: 'Procesando',
+                      html: 'I will close in <b></b> milliseconds.',
+                      timer: 1000,
+                      timerProgressBar: true,
+                      didOpen: () => {
+                        Swal.showLoading()
+                        const b = Swal.getHtmlContainer().querySelector('b')
+                        timerInterval = setInterval(() => {
+                          b.textContent = Swal.getTimerLeft()
+                        }, 100)
+                      },
+                      willClose: () => {
+                        clearInterval(timerInterval)
+                      }
+                    }).then((result) => {
+                      /* Read more about handling dismissals below */
+                      if (result.dismiss === Swal.DismissReason.timer) {
+                        console.log('I was closed by the timer');
+                                  let totalp = parseInt(document.getElementById("total").value);
+                              totalp += precio;
+                                        //*******************************************************
+                              const contador =  document.getElementById('total');
+                              contador.value = totalp;
+                          document.getElementById('result').appendChild(p);
+                          document.getElementById('result').appendChild(input).disabled = true;
+                          document.getElementById("total").value = totalp;
+                      }
+                    })
+              }else{
+                    (async () => {
+
+                    const { value: precioproducto } = await Swal.fire({
+                      title: Producto,
+                      input: 'number',
+                      inputLabel: 'Ingrese su precio',
+                      inputPlaceholder: 'Precio',
+                    })
+
+                    if (precioproducto) {
+                     let totalp = parseInt(document.getElementById("total").value);
+                      totalp += parseInt(precioproducto);
+                      const contador =  document.getElementById('total');
+                      contador.value = totalp;
+                          document.getElementById('result').appendChild(p);
+                          input.value = precioproducto;
+                          document.getElementById('result').appendChild(input).disabled = true;
+                          document.getElementById("total").value = totalp;
+                    }
+
+                    })()
+              }
+
+              })
+
+        }
+
+        
+        function onScanError(errorMessage) {
+          //handle scan error
+        }
+        var html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess, onScanError);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+    
+
+
+  </body>
+</html>

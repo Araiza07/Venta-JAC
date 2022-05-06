@@ -1,0 +1,65 @@
+            
+            
+            <div class="col">
+                <h1 id="htitle">Actualizacion de Productos</h1>
+            </div>
+        <br><br><br><br>
+
+    <div>
+        <div style="overflow: auto; width: 60%; margin: 10px auto; height: 400px;">
+            <table style="padding: 20px;">
+                <tr style="padding: 29px;">
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Actualizar</th>
+                    <th>Codigo QR</th>
+                    <th>Eliminar</th>
+                </tr>
+                  {{#each productos}}
+                <tr>
+                    <td style="padding: 20px;">{{NombreP}}</td>
+                    <td style="padding: 20px;">{{Precio}}</td>
+                    <td style="padding: 20px;"><a href="/actualizar/{{_id}}">Actualizar</a></td>
+                    <td>
+
+                     <div id="{{_id}}">
+                          <img src="{{QR}}" alt="qr" id="qr" style="padding: 10px;">
+                    </div>
+                        <input type="number" min="1" id="{{NombreP}}" placeholder="Numero de impresiones" value="1">
+
+                        <input type="button" onclick="printDiv('{{_id}}','{{NombreP}}')" value="imprimir QR" />
+
+                    </td>
+                    <td style="padding: 20px;">
+                        <a href="/eliminar/{{_id}}">Eliminar</a></td>
+                    </tr>
+                {{/each}}
+            </table>
+        </div>
+
+<script language="Javascript">
+
+    function printDiv(nombreDiv,numperoImp) {
+        let inputValue = document.getElementById(numperoImp).value; 
+        let contenidoqr = [];
+        for (let i = 0; i < inputValue; i++) {
+            contenidoqr.push(document.getElementById(nombreDiv).innerHTML);
+  
+}
+
+     var contenido = contenidoqr;
+
+     var contenidoOriginal= document.body.innerHTML;
+    //for(i=0;i>=10;i++){
+     document.body.innerHTML = contenido;
+    //}
+
+
+     window.print();
+
+     document.body.innerHTML = contenidoOriginal;
+}
+	</script>
+        {{!-- <button class="btn btn-primary"><a href="/" style="color: aliceblue;">Inicio</a></button> --}}
+    </div>
+    <br><br><br> 
